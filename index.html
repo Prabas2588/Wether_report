@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WeatherX - Daily Forecast</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 15px;
+      max-width: 450px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 28px;
+      color: #333;
+    }
+
+    input {
+      padding: 0.8rem;
+      font-size: 16px;
+      width: 100%;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      font-size: 16px;
+      background-color: #0072ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+
+    button:hover {
+      background-color: #005ecb;
+    }
+
+    .weather-info {
+      text-align: left;
+      font-size: 16px;
+      color: #444;
+    }
+
+    .weather-info p {
+      margin: 0.5rem 0;
+    }
+
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 22px;
+      }
+
+      input, button {
+        font-size: 14px;
+        padding: 0.7rem;
+      }
+
+      .weather-info {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>WeatherX - Daily Forecast 🌤️</h1>
+    <input type="text" id="cityInput" placeholder="Enter city name">
+    <button onclick="getDailyForecast()">Get Forecast</button>
+    <div class="weather-info" id="forecastResult"></div>
+  </div>
+
+  <script>
+    async function getDailyForecast() {
+      const city = document.getElementById("cityInput").value.trim();
+      const resultDiv = document.getElementById("forecastResult");
+
+      if (!city) {
+        resultDiv.innerHTML = "<p>Please enter a city name.</p>";
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://wttr.in/${city}?format=j1`);
+        const data = await response.json();
+
+        const today = data.weather[0];
+        const condition = today.hourly[4].weatherDesc[0].value; // Around 12PM
+        const temp = today.avgtempC;
+        const wind = today.hourly[4].windspeedKmph;
+        const humidity = today.hourly[4].humidity;
+        const feelsLike = today.hourly[4].FeelsLikeC;
+
+        resultDiv.innerHTML = `
+          <p><strong>City:</strong> ${city}</p>
+          <p><strong>Average Temperature:</strong> ${temp} °C</p>
+          <p><strong>Condition:</strong> ${condition}</p>
+          <p><strong>Feels Like:</strong> ${feelsLike} °C</p>
+          <p><strong>Humidity:</strong> ${humidity}%</p>
+          <p><strong>Wind Speed:</strong> ${wind} km/h</p>
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = "<p>Could not fetch weather data. Please try again.</p>";
+      }
+    }
+  </script>
+
+</body>
+</html>
